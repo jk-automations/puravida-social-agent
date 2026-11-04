@@ -1,0 +1,34 @@
+[
+ {
+  "case": "A",
+  "decision": "approve",
+  "queue_before": 4,
+  "queue_after": 5,
+  "delta": 1,
+  "page_errors": []
+ },
+ {
+  "case": "B",
+  "decision": "reject",
+  "queue_before": 5,
+  "queue_after": 5,
+  "delta": 0,
+  "page_errors": []
+ },
+ {
+  "approved_entry": {
+   "account": "studio",
+   "format": "reel",
+   "hook": "E2E TEST corrección de hombros",
+   "caption": "Probando algo nuevo 🧐 ¿Qué creen?",
+   "hashtags": "#pilates #barre",
+   "scheduled_for": "2026-11-10T15:00:00Z",
+   "why": "Prueba técnica de funcionalidad",
+   "status": "approved-queued",
+   "queued_at": "2026-11-04T23:30:52.760028+00:00"
+  }
+ },
+ {
+  "queue_restored_len": 4
+ }
+]
