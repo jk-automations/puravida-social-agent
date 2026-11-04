@@ -14,7 +14,11 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from deepagents import create_deep_agent
+from deepagents.profiles import (GeneralPurposeSubagentProfile,
+                                 HarnessProfile,
+                                 register_harness_profile)
 from deepagents.backends import FilesystemBackend
+from deepagents.middleware.filesystem import FilesystemMiddleware
 from langchain.agents.middleware import HumanInTheLoopMiddleware
 from langchain_core.tools import tool
 
@@ -87,7 +91,7 @@ def propose_post(account: str, format: str, hook: str, caption: str,
     scheduled_for: ISO date/time the agent recommends. why: one line — the
     growth reason (which playbook method this is).
     """
-    if os.environ.get("PURAVIDA_AGENT_ENABLED") != "true":
+    if not _kill_switch_on():
         return ("Kill switch is OFF (PURAVIDA_AGENT_ENABLED is not "
                 "set to true). This agent is disabled; nothing was queued.")
     entry = {
@@ -134,6 +138,40 @@ def _brand_instructions() -> str:
     return "\n\n---\n\n".join(parts)
 
 
+def _kill_switch_on() -> bool:
+    """Kill switch, read from the .env FILE (source of truth).
+
+    The LangGraph dev loader does not reliably surface .env values to
+    os.environ before this module is imported (observed 2026-11-04:
+    the worker env carried the flag, yet the graph had been built as
+    if it were on). Reading the file directly makes the switch
+    independent of loader/import order. Falls back to os.environ.
+    """
+    env_file = BASE / ".env"
+    if env_file.exists():
+        for line in env_file.read_text(encoding="utf-8").splitlines():
+            line = line.strip()
+            if line.startswith("PURAVIDA_AGENT_ENABLED="):
+                return line.split("=", 1)[1].strip() == "true"
+    return os.environ.get("PURAVIDA_AGENT_ENABLED") == "true"
+
+
+# Trim the Deep Agents default surface to what this agent is declared
+# to have: no sub-agent delegation (task), no code execution
+# (execute), no file deletion (delete). Filesystem read/write stay,
+# scoped by the virtual backend to this directory.
+_PROFILE = HarnessProfile(
+    excluded_tools=frozenset({"task", "execute", "delete"}),
+    general_purpose_subagent=GeneralPurposeSubagentProfile(enabled=False),
+)
+for _key in {os.environ.get("MODEL_NAME", ""), "openai"}:
+    if _key:
+        try:
+            register_harness_profile(_key, _PROFILE)
+        except Exception:
+            pass
+
+
 SYSTEM_PROMPT = """You are the Social Media Manager for Pura Vida Moves (Pilates /
 barre / sculpt, Guanacaste, Costa Rica). Your full definition — mission,
 rules, success measures — is in your memory (AGENT.md). Your client is
@@ -169,16 +207,33 @@ BRAND ESSENTIALS (full files in /brain/ — the map is brain/index.md; its Unkno
 
 """ + _brand_instructions()
 
+if not _kill_switch_on():
+    SYSTEM_PROMPT += (
+        "\n\nSTATUS: DISABLED by the operator kill switch. "
+        "propose_post is unavailable and you cannot queue posts. "
+        "If asked to propose or queue a post, say plainly that "
+        "the agent is currently disabled.")
+
+_BACKEND = FilesystemBackend(root_dir=str(BASE), virtual_mode=True)
+
+
 agent = create_deep_agent(
     name="social_media_manager",
     model=os.environ.get("MODEL_NAME", "openai:gpt-4.1"),
     tools=([account_snapshot, lens_quick_audit, content_queue]
-           + ([propose_post] if os.environ.get("PURAVIDA_AGENT_ENABLED") == "true" else [])),
+           + ([propose_post] if _kill_switch_on() else [])),
     system_prompt=SYSTEM_PROMPT,
-    backend=FilesystemBackend(root_dir=str(BASE), virtual_mode=True),
+    backend=_BACKEND,
     memory=["/AGENT.md", "/brain/index.md"],
     skills=["/skills"],
     middleware=[
+        # Own FilesystemMiddleware replaces the default: only the
+        # read/write tools this agent is declared to have. No
+        # execute (code execution), no delete.
+        FilesystemMiddleware(
+            backend=_BACKEND,
+            tools=["ls", "read_file", "write_file", "edit_file", "glob", "grep"],
+        ),
         HumanInTheLoopMiddleware(
             interrupt_on={
                 "propose_post": {

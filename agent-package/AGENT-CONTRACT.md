@@ -36,7 +36,7 @@ Two capabilities exceed the Scout/Scribe baseline and are justified here:
 ## Control loop and limits
 
 - One chat run: read brain/skills as needed, call read tools freely, draft freely. Any propose_post call suspends the run at a LangGraph interrupt until a human decision arrives; the run cannot resume itself, time out into approval, or retry around a rejection.
-- Kill switch: `PURAVIDA_AGENT_ENABLED` (server-only env). Unless it is exactly "true", propose_post is not registered as a tool at all and its body also refuses if somehow invoked (fail-closed, verified both ways on 2026-11-04). Changing it requires a server restart, which the runbook documents.
+- Kill switch: `PURAVIDA_AGENT_ENABLED` (server-only env). Unless it is exactly "true", propose_post is not registered as a tool at all and its body also refuses if somehow invoked (fail-closed, verified both ways on 2026-11-04). In disabled mode the model may still attempt the call from its instructions; the runtime rejects it as an invalid tool and nothing can queue (verified live on the JK rig), and the prompt carries a DISABLED status line so the agent says it is off instead of trying. The switch is read from the .env file at graph build, because the dev loader does not reliably surface .env values to the process environment first (observed 2026-11-04). Changing it requires a server restart, which the runbook documents.
 - Limits: max_wall_clock_ms 300000 per run; max_output_tokens 4096 per model call; caption length and content rules are enforced by the julie-voice skill checks, not by the platform.
 - No delegation: the agent has no sub-agents configured and cannot spawn any. No browser, no shell, no network tools beyond the model call and the local snapshot files.
 
