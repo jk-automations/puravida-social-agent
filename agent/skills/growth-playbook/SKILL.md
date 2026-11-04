@@ -7,7 +7,7 @@ description: The 13 non-standard growth methods for Julie's accounts and how to 
 
 Goal #1: grow both accounts. Every proposed post or action names the
 method it uses (that is the "why" in propose_post). Full text lives in
-brand/growth-playbook.md. Run methods as experiments: one variable at a
+brain/growth-playbook.md. Run methods as experiments: one variable at a
 time, judge on saves/shares/comments/follows after 7 days, keep winners.
 
 1. **Two-account Collab loop** — studio posts co-authored with Julie's

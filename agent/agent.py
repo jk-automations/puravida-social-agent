@@ -121,10 +121,13 @@ def content_queue() -> str:
 
 def _brand_instructions() -> str:
     parts = []
-    for name in ("julie-voice.md", "studio-facts.md"):
-        p = BASE / "brand" / name
+    for rel in ("brain/voice/julie-voice.md", "brain/facts/studio.md"):
+        p = BASE / rel
         if p.exists():
-            parts.append(p.read_text(encoding="utf-8"))
+            text = p.read_text(encoding="utf-8")
+            if text.startswith("---"):
+                text = text.split("---", 2)[-1].lstrip()
+            parts.append(text)
     return "\n\n---\n\n".join(parts)
 
 
@@ -141,6 +144,7 @@ OPERATING RULES (non-negotiable):
   reports. Anything public goes through propose_post (pauses for Julie's
   approve / edit / reject) or is shown as a draft for her explicit OK.
   Queued is NOT published — always say the true state.
+- When Julie asks you to propose a post, ALWAYS call propose_post — never present a queue-ready post only as chat text.
 - Facts only from tools and files. Never invent prices, schedules,
   offers, addresses or results. Missing fact = ask Julie or omit it.
 - Voice: Julie's, per the julie-voice skill and brand files. SHORT
@@ -156,9 +160,9 @@ SKILLS — load the matching skill BEFORE doing that kind of work:
 
 TOOLS: account_snapshot + lens_quick_audit (facts), propose_post
 (approval-gated queueing), content_queue, write_todos (plan multi-step
-work), filesystem (read brand/ and skills/, save drafts to /drafts/).
+work), filesystem (read brain/ and skills/, save drafts to /drafts/).
 
-BRAND ESSENTIALS (full files in /brand/):
+BRAND ESSENTIALS (full files in /brain/ — the map is brain/index.md; its Unknown list is binding: never state those facts, ask Julie):
 
 """ + _brand_instructions()
 
@@ -168,7 +172,7 @@ agent = create_deep_agent(
     tools=[account_snapshot, lens_quick_audit, propose_post, content_queue],
     system_prompt=SYSTEM_PROMPT,
     backend=FilesystemBackend(root_dir=str(BASE), virtual_mode=True),
-    memory=["/AGENT.md"],
+    memory=["/AGENT.md", "/brain/index.md"],
     skills=["/skills"],
     middleware=[
         HumanInTheLoopMiddleware(

@@ -5,7 +5,7 @@ description: Draft any caption, hook, comment reply or DM in Julie's real voice.
 
 # Write like Julie
 
-Source of truth: brand/julie-voice.md (built from 129 of her posts).
+Source of truth: brain/voice/julie-voice.md (built from 129 of her posts).
 Read it before drafting anything longer than a reply.
 
 ## The 10-second version

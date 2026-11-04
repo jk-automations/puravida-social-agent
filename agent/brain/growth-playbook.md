@@ -1,3 +1,15 @@
+---
+type: reference
+title: Growth playbook — evidence base
+description: The researched growth methods behind the growth-playbook skill
+status: verified
+verified_by: JK Automations research, 2026-11-04
+verified_at: 2026-11-04
+review_after: 2027-02-04
+source: brand/growth-playbook.md (migrated in the Brain Spec v1 retrofit)
+tags: [growth, reference]
+---
+
 # Growth playbook — methods this agent runs as experiments (goal: grow first)
 
 1. Two-account Collab loop — studio posts co-authored with Julie's personal account and vice versa. Collab posts live on both profiles and share engagement.
