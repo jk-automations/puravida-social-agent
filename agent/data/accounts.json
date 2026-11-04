@@ -1,1 +1,58 @@
-{"personal":{"best_recent":{"comments":2,"likes":47,"why":"class photos with community energy and a proud progress note (students graduating from 7lb to 10lb weights)"},"bio_summary":"Co-fundadora @puravidamoves.studio, profe Barre y Sculpt, Theta Healer, nacida en Guanacaste, descendencia Chorotega","followers":595,"following":398,"handle":"@puravidamoves","links":["WhatsApp group","wa.me direct","puravidamoves.com"],"name_field":"Yuli","posts":373,"role":"Julie's personal account — the face and trust of the studio","snapshot_date":"2026-11-04","typical_flyer":"4-7 likes / 0-2 comments"},"studio":{"best_recent":{"comments":19,"likes":86,"why":"Julie's personal founder story (posted 2026-10-27): wanting students to feel safe enough to arrive in tears. Vulnerable + personal = the account's top engagement by far."},"bio_summary":"Comunidad, Guanacaste — Niños, Teens, Adultos — Barre, Funcionales, Yoga, Danza, Sculpt, Calistenia, Striking (Boxeo y Kickboxing)","followers":564,"following":null,"handle":"@puravidamoves.studio","links":["WhatsApp group","wa.me direct","puravidamoves.com"],"name_field":"Pura Vida Moves Studio","posts":null,"role":"The studio's business account — offer, schedule, proof","snapshot_date":"2026-11-04","typical_flyer":"4-7 likes / 0-2 comments"}}
+{
+  "personal": {
+    "best_recent": {
+      "comments": 2,
+      "likes": 47,
+      "why": "class photos with community energy and a proud progress note (students graduating from 7lb to 10lb weights)"
+    },
+    "bio_summary": "Co-fundadora @puravidamoves.studio, profe Barre y Sculpt, Theta Healer, nacida en Guanacaste, descendencia Chorotega",
+    "followers": 595,
+    "following": 398,
+    "handle": "@puravidamoves",
+    "links": [
+      "WhatsApp group",
+      "wa.me direct",
+      "puravidamoves.com"
+    ],
+    "name_field": "Yuli",
+    "posts": 373,
+    "role": "Julie's personal account — the face and trust of the studio",
+    "snapshot_date": "2026-11-04",
+    "typical_flyer": "4-7 likes / 0-2 comments",
+    "known_findings": [
+      "CONTENIDO: videos cortos de humor en clase son su formato top (39-59 likes): caras de la clase, sostenga, morir juntas con la musiquita.",
+      "Cumpleaños de alumnas (barreaños) son un ritual que la comunidad ama (39 likes / 10 comentarios).",
+      "Hashtags en 20 de 70 posts — más que el estudio, aún sin sistema.",
+      "SIN VERIFICAR: pins, Highlights, si el link de WhatsApp es el primer link de la bio."
+    ]
+  },
+  "studio": {
+    "best_recent": {
+      "comments": 19,
+      "likes": 86,
+      "why": "Julie's personal founder story (posted 2026-10-27): wanting students to feel safe enough to arrive in tears. Vulnerable + personal = the account's top engagement by far."
+    },
+    "bio_summary": "Comunidad, Guanacaste — Niños, Teens, Adultos — Barre, Funcionales, Yoga, Danza, Sculpt, Calistenia, Striking (Boxeo y Kickboxing)",
+    "followers": 564,
+    "following": null,
+    "handle": "@puravidamoves.studio",
+    "links": [
+      "WhatsApp group",
+      "wa.me direct",
+      "puravidamoves.com"
+    ],
+    "name_field": "Pura Vida Moves Studio",
+    "posts": null,
+    "role": "The studio's business account — offer, schedule, proof",
+    "snapshot_date": "2026-11-04",
+    "typical_flyer": "4-7 likes / 0-2 comments",
+    "known_findings": [
+      "CONTENIDO (129 posts analizados, 2026-11-04): lo emocional/comunitario gana por goleada — post de una línea de corazón: 211 likes (récord); intro de cofundadoras en Collab: 124 likes / 25 comentarios; historia de Julie: 86/19. Flyers de promo: 4-7 likes.",
+      "VOZ fuerte: captions cortos (~170 caracteres promedio), humor de clase y comunidad real que responde con nombres y risas.",
+      "HASHTAGS casi ausentes: solo 4 de 59 posts del estudio llevan hashtags — descubrimiento por búsqueda está sin explotar.",
+      "COLLAB entre cuentas YA funcionó (intro co-autorada) pero no es sistema: es ocasional.",
+      "SIN VERIFICAR (no inventar): pins actuales, Highlights y orden, campo de nombre exacto, link de reserva en bio del estudio. Pedir captura a Julie o acceso a la cuenta.",
+      "Ruta de conversión conocida: WhatsApp es el canal (grupo + link en la cuenta personal). No hay oferta intro visible en los datos."
+    ]
+  }
+}

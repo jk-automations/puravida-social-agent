@@ -55,3 +55,12 @@ Studio deployment (`social_agent` graph at http://100.108.226.67:2024).
 - Next: real Instagram read refresh (Meta token for Julie's accounts),
   approval-gated publishing, scheduled proactive runs (morning sweep,
   Monday plan, Friday report), LangSmith eval dataset v1.
+
+## v2 polish — 2026-11-04
+- **Voice profile v2** (agent/brand/julie-voice.md): built from 129 real posts + comment threads — two registers (profe cómica / corazón), birthday ritual ("barreaños"), caption stats (~170 chars, hashtags rare).
+- **Skills** (agent/skills/): lens-audit, julie-voice, growth-playbook, weekly-rhythm — loaded via Deep Agents SkillsMiddleware.
+- **Agent definition** (agent/AGENT.md): mission, approvals-only rules, hard never-list, success measures — loaded as agent memory.
+- **Config fix**: dashboard defaults load synchronously (src/lib/config.ts) — no setup screen, opens straight into the agent.
+- **Logo**: sun-over-waves mark in public/logo.svg, header + favicon (src/app/icon.svg).
+- Seeded audit findings in agent/data/accounts.json now carry the verified corpus evidence; unverifiable items are marked SIN VERIFICAR.
+- Known limit: the local Qwen2.5:32b follows skill structure but does not reliably complete multi-step scoring procedures; a frontier model (OpenAI top-up) sharpens skill execution without code changes.

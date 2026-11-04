@@ -113,6 +113,7 @@ function HomePageInner({
       <div className="flex h-screen flex-col">
         <header className="flex h-16 items-center justify-between border-b border-border px-6">
           <div className="flex items-center gap-4">
+            <img src="/logo.svg" alt="Pura Vida Moves" className="h-9 w-9 rounded-[10px]" />
             <h1 className="text-xl font-semibold">Pura Vida Moves · Social Media Manager</h1>
             {!sidebar && (
               <Button
@@ -204,7 +205,7 @@ function HomePageInner({
 }
 
 function HomePageContent() {
-  const [config, setConfig] = useState<StandaloneConfig | null>(null);
+  const [config, setConfig] = useState<StandaloneConfig | null>(() => getConfig());
   const [configDialogOpen, setConfigDialogOpen] = useState(false);
   const [assistantId, setAssistantId] = useQueryState("assistantId");
 

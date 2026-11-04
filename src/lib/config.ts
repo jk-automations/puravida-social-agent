@@ -6,16 +6,25 @@ export interface StandaloneConfig {
 
 const CONFIG_KEY = "deep-agent-config";
 
+export const DEFAULT_CONFIG: StandaloneConfig = {
+  deploymentUrl:
+    process.env.NEXT_PUBLIC_DEPLOYMENT_URL || "http://100.108.226.67:2024",
+  assistantId: process.env.NEXT_PUBLIC_ASSISTANT_ID || "social_agent",
+  langsmithApiKey: process.env.NEXT_PUBLIC_LANGSMITH_API_KEY || "",
+};
+
 export function getConfig(): StandaloneConfig | null {
   if (typeof window === "undefined") return null;
 
   const stored = localStorage.getItem(CONFIG_KEY);
-  if (!stored) return null;
+  if (!stored) return DEFAULT_CONFIG;
 
   try {
-    return JSON.parse(stored);
+    const parsed = JSON.parse(stored) as StandaloneConfig;
+    if (!parsed.deploymentUrl || !parsed.assistantId) return DEFAULT_CONFIG;
+    return parsed;
   } catch {
-    return null;
+    return DEFAULT_CONFIG;
   }
 }
 
