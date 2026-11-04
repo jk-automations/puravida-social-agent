@@ -14,7 +14,9 @@ export const DEFAULT_CONFIG: StandaloneConfig = {
 };
 
 export function getConfig(): StandaloneConfig | null {
-  if (typeof window === "undefined") return null;
+  // Server render uses the same defaults so first paint IS the app,
+  // never a setup screen (Julie/Justin just open the link and chat).
+  if (typeof window === "undefined") return DEFAULT_CONFIG;
 
   const stored = localStorage.getItem(CONFIG_KEY);
   if (!stored) return DEFAULT_CONFIG;
