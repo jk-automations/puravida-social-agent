@@ -1,0 +1,42 @@
+# AGENT-MANIFEST.yaml — client-puravida-social-v1
+#
+# This package describes an EXTERNAL agent for the Dojo catalog. The
+# runtime is a LangChain Deep Agents / LangGraph application living in
+# its own repo (github.com/jk-automations/puravida-social-agent); it is
+# not an opsManager work-order employee. The package is the
+# definition-of-record the catalog renders.
+
+schema_version: 1
+package_id: client-puravida-social-v1
+created: 2026-11-04
+owner: JK Automations founders
+release: 0.1.0
+environment: jk-internal
+classification: A2
+risk_tier: medium
+client_triggered: false
+kill_switches:
+  - PURAVIDA_AGENT_ENABLED
+runtime:
+  framework: LangGraph (Deep Agents), external repo jk-automations/puravida-social-agent
+  host: Studio test rig (LangGraph server :2024, dashboard :3100); hosted move is planned
+  model: openai:deepseek/deepseek-chat via OpenRouter
+agents:
+  - agent_id: client-puravida-social-v1
+    workflow: puravida_social_manager_v1
+    receiver_profile: puravida-owner
+    output: chat replies in the client dashboard; approved post records appended to the content queue (JSON)
+    model_calls: "loop (Deep Agents chat; the only write action is approval-gated)"
+    max_output_tokens: 4096
+    max_wall_clock_ms: 300000
+    tools: [account_snapshot, lens_quick_audit, propose_post, content_queue, filesystem_read, filesystem_write]
+prohibited:
+  - client_trigger
+  - publish
+  - external_send
+  - spend
+  - provider_or_account_connection
+  - business_brain_write
+  - self_approval
+  - delegation
+review_chain: agent_draft -> julie_exact_approval (approve/edit/reject interrupt) -> queue_only_no_publish

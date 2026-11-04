@@ -1,0 +1,81 @@
+# TOOL-POLICY.yaml — client-puravida-social-v1
+# deny_by_default stays true. Only the tools below exist in the runtime;
+# anything not listed is not merely denied, it is absent.
+
+schema_version: 1
+deny_by_default: true
+tools:
+  account_snapshot:
+    version: 1
+    class: read
+    profiles: [client-puravida-social-v1]
+    tenant_scope: exact_client (Pura Vida Moves only)
+    states: [approved]
+    maximum_records: 1
+    maximum_bytes: 16384
+    writes: false
+  lens_quick_audit:
+    version: 1
+    class: read
+    profiles: [client-puravida-social-v1]
+    tenant_scope: exact_client (Pura Vida Moves only)
+    states: [approved]
+    maximum_records: 1
+    maximum_bytes: 16384
+    writes: false
+  content_queue:
+    version: 1
+    class: read
+    profiles: [client-puravida-social-v1]
+    tenant_scope: exact_client (Pura Vida Moves only)
+    states: [approved]
+    maximum_records: 100
+    maximum_bytes: 65536
+    writes: false
+  propose_post:
+    version: 1
+    class: write
+    profiles: [client-puravida-social-v1]
+    tenant_scope: exact_client (Pura Vida Moves only)
+    states: [approved]
+    maximum_records: 1
+    maximum_bytes: 8192
+    writes: true
+    # Justified in AGENT-CONTRACT.md "Necessity and pattern": the write is
+    # one record appended to a local queue file, it cannot execute without
+    # a human approve/edit/reject decision at the LangGraph interrupt,
+    # and the tool is not registered at all unless the kill switch env
+    # PURAVIDA_AGENT_ENABLED is exactly "true".
+  filesystem_read:
+    version: 1
+    class: read
+    profiles: [client-puravida-social-v1]
+    tenant_scope: agent_directory_only (virtual filesystem rooted at the agent repo)
+    states: [approved]
+    maximum_records: 50
+    maximum_bytes: 262144
+    writes: false
+  filesystem_write:
+    version: 1
+    class: write
+    profiles: [client-puravida-social-v1]
+    tenant_scope: agent_directory_only (drafts/ and brain/lessons/corrections-inbox.md by convention)
+    states: [approved]
+    maximum_records: 10
+    maximum_bytes: 65536
+    writes: true
+    # Justified in AGENT-CONTRACT.md "Necessity and pattern": drafts are
+    # inert; brain corrections land in the corrections inbox for human
+    # promotion; all files are in git (visible, revertible). Mechanical
+    # write-gating is Phase 2 work and is not claimed here.
+denied_capabilities:
+  - arbitrary_url_discovery
+  - browser_control
+  - shell
+  - email
+  - messaging
+  - publishing
+  - advertising_accounts
+  - purchases
+  - code_execution
+  - delegation
