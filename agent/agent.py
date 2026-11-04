@@ -87,6 +87,9 @@ def propose_post(account: str, format: str, hook: str, caption: str,
     scheduled_for: ISO date/time the agent recommends. why: one line — the
     growth reason (which playbook method this is).
     """
+    if os.environ.get("PURAVIDA_AGENT_ENABLED") != "true":
+        return ("Kill switch is OFF (PURAVIDA_AGENT_ENABLED is not "
+                "set to true). This agent is disabled; nothing was queued.")
     entry = {
         "account": account,
         "format": format,
@@ -169,7 +172,8 @@ BRAND ESSENTIALS (full files in /brain/ — the map is brain/index.md; its Unkno
 agent = create_deep_agent(
     name="social_media_manager",
     model=os.environ.get("MODEL_NAME", "openai:gpt-4.1"),
-    tools=[account_snapshot, lens_quick_audit, propose_post, content_queue],
+    tools=([account_snapshot, lens_quick_audit, content_queue]
+           + ([propose_post] if os.environ.get("PURAVIDA_AGENT_ENABLED") == "true" else [])),
     system_prompt=SYSTEM_PROMPT,
     backend=FilesystemBackend(root_dir=str(BASE), virtual_mode=True),
     memory=["/AGENT.md", "/brain/index.md"],
