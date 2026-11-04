@@ -1,0 +1,19 @@
+[project]
+name = "puravida-social-agent"
+version = "0.1.0"
+description = "Pura Vida Moves — one social media manager agent (Deep Agents) for Julie"
+requires-python = ">=3.11"
+dependencies = [
+    "deepagents",
+    "langchain-openai",
+    "langchain-ollama",
+    "langsmith",
+]
+
+[dependency-groups]
+dev = [
+    "langgraph-cli[inmem]",
+]
+
+[tool.uv]
+package = false

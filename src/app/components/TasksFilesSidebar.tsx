@@ -187,7 +187,7 @@ export const TasksFilesSidebar = React.memo<{
         <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-hidden">
           <div className="flex items-center justify-between px-3 pb-1.5 pt-2">
             <span className="text-xs font-semibold tracking-wide text-zinc-600">
-              AGENT TASKS
+              THIS WEEK — THE PLAN
             </span>
             <button
               onClick={() => setTasksOpen((v) => !v)}
@@ -206,7 +206,7 @@ export const TasksFilesSidebar = React.memo<{
                 {todos.length === 0 ? (
                   <div className="flex h-full items-center justify-center p-4 text-center">
                     <p className="text-xs text-muted-foreground">
-                      No tasks created yet
+                      Nothing planned yet — your agent builds the plan here
                     </p>
                   </div>
                 ) : (
@@ -237,7 +237,7 @@ export const TasksFilesSidebar = React.memo<{
 
           <div className="flex items-center justify-between px-3 pb-1.5 pt-2">
             <span className="text-xs font-semibold tracking-wide text-zinc-600">
-              FILE SYSTEM
+              DRAFTS & FILES
             </span>
             <button
               onClick={() => setFilesOpen((v) => !v)}

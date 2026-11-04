@@ -1,9 +1,15 @@
+import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { Toaster } from "sonner";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
+
+export const metadata: Metadata = {
+  title: "Pura Vida Moves · Social Media Manager",
+  description: "Julie's social media manager — chat, approvals, this week.",
+};
 
 export default function RootLayout({
   children,

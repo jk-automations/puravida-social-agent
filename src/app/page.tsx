@@ -113,7 +113,7 @@ function HomePageInner({
       <div className="flex h-screen flex-col">
         <header className="flex h-16 items-center justify-between border-b border-border px-6">
           <div className="flex items-center gap-4">
-            <h1 className="text-xl font-semibold">Deep Agent UI</h1>
+            <h1 className="text-xl font-semibold">Pura Vida Moves · Social Media Manager</h1>
             {!sidebar && (
               <Button
                 variant="ghost"
@@ -122,7 +122,7 @@ function HomePageInner({
                 className="rounded-md border border-border bg-card p-3 text-foreground hover:bg-accent"
               >
                 <MessagesSquare className="mr-2 h-4 w-4" />
-                Threads
+                Chats
                 {interruptCount > 0 && (
                   <span className="ml-2 inline-flex min-h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-[10px] text-destructive-foreground">
                     {interruptCount}
@@ -133,7 +133,7 @@ function HomePageInner({
           </div>
           <div className="flex items-center gap-2">
             <div className="text-sm text-muted-foreground">
-              <span className="font-medium">Assistant:</span>{" "}
+              <span className="font-medium">Agent:</span>{" "}
               {config.assistantId}
             </div>
             <Button
@@ -152,7 +152,7 @@ function HomePageInner({
               className="border-[#2F6868] bg-[#2F6868] text-white hover:bg-[#2F6868]/80"
             >
               <SquarePen className="mr-2 h-4 w-4" />
-              New Thread
+              New Chat
             </Button>
           </div>
         </header>
@@ -211,11 +211,21 @@ function HomePageContent() {
   // On mount, check for saved config, otherwise show config dialog
   useEffect(() => {
     const savedConfig = getConfig();
+    const defaultConfig: StandaloneConfig = {
+      deploymentUrl:
+        process.env.NEXT_PUBLIC_DEPLOYMENT_URL || "http://100.108.226.67:2024",
+      assistantId: process.env.NEXT_PUBLIC_ASSISTANT_ID || "social_agent",
+      langsmithApiKey: process.env.NEXT_PUBLIC_LANGSMITH_API_KEY || "",
+    };
     if (savedConfig) {
       setConfig(savedConfig);
       if (!assistantId) {
         setAssistantId(savedConfig.assistantId);
       }
+    } else if (defaultConfig.deploymentUrl) {
+      saveConfig(defaultConfig);
+      setConfig(defaultConfig);
+      setAssistantId(defaultConfig.assistantId);
     } else {
       setConfigDialogOpen(true);
     }
@@ -247,15 +257,15 @@ function HomePageContent() {
         />
         <div className="flex h-screen items-center justify-center">
           <div className="text-center">
-            <h1 className="text-2xl font-bold">Welcome to Standalone Chat</h1>
+            <h1 className="text-2xl font-bold">Pura Vida Moves · Social Media Manager</h1>
             <p className="mt-2 text-muted-foreground">
-              Configure your deployment to get started
+              Tu agente de redes sociales — configura la conexión para empezar
             </p>
             <Button
               onClick={() => setConfigDialogOpen(true)}
               className="mt-4"
             >
-              Open Configuration
+              Configurar
             </Button>
           </div>
         </div>
