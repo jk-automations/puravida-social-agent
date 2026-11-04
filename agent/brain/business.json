@@ -1,0 +1,38 @@
+{
+  "@context": "https://schema.org",
+  "@type": "HealthClub",
+  "name": "Pura Vida Moves Studio",
+  "url": "https://puravidamoves.com",
+  "sameAs": [
+    "https://www.instagram.com/puravidamoves.studio",
+    "https://www.instagram.com/puravidamoves"
+  ],
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "Guanacaste",
+    "addressCountry": "CR"
+  },
+  "knowsAbout": [
+    "Barre",
+    "Funcionales",
+    "Yoga",
+    "Danza",
+    "Sculpt",
+    "Calistenia",
+    "Striking"
+  ],
+  "audience": [
+    {
+      "@type": "Audience",
+      "audienceType": "Kids"
+    },
+    {
+      "@type": "Audience",
+      "audienceType": "Teens"
+    },
+    {
+      "@type": "Audience",
+      "audienceType": "Adults"
+    }
+  ]
+}
