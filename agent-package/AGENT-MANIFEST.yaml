@@ -15,8 +15,7 @@ environment: jk-internal
 classification: A2
 risk_tier: medium
 client_triggered: false
-kill_switches:
-  - PURAVIDA_AGENT_ENABLED
+kill_switch: PURAVIDA_AGENT_ENABLED           # read from the agent's own .env file, fail-closed (tested 2026-11-04 on PV)
 runtime:
   framework: LangGraph (Deep Agents), external repo jk-automations/puravida-social-agent
   host: Studio test rig (LangGraph server :2024, dashboard :3100); hosted move is planned
@@ -40,3 +39,22 @@ prohibited:
   - self_approval
   - delegation
 review_chain: agent_draft -> julie_exact_approval (approve/edit/reject interrupt) -> queue_only_no_publish
+# --- checklist v2.0 fields (2026-11-04) ---
+runtime_kind: py-deepagents
+model_access: OpenRouter deepseek/deepseek-chat, per-agent key in agent/.env
+data_class: client-business
+running_cost:
+  monthly_usd_estimate: 5          # pilot on the Studio today; client VPS adds about $10-20/mo (founder gate)
+  paid_by: jk                      # pilot only; client billing not decided
+  items: [OpenRouter model usage, Studio hosting today (temporary), planned client VPS]
+hosting:
+  where: studio-internal           # VIOLATES the client-hosting rule; temporary pilot, moves to a client VPS (M3)
+  supervisor: nohup today
+  api_auth: NONE today - langgraph dev on 0.0.0.0:2024, reachable on the tailnet (M3 fixes)
+reuse:
+  - {what: chat dashboard, source: langchain-ai/deep-agents-ui (upstream archived 2026-06-28; JK owns the fork), license: MIT}
+  - {what: agent runtime, source: langchain-ai/deepagents + LangGraph, license: MIT}
+  - {what: approval gate + model retry, source: LangChain HumanInTheLoopMiddleware + ModelRetryMiddleware, license: MIT}
+  - {what: human-approval post pattern, source: langchain-ai/social-media-agent (pattern only), license: MIT}
+  - {what: profile audit rubric, source: JK Lens social-media-audit skill, license: JK internal}
+domains: [social-agent]
