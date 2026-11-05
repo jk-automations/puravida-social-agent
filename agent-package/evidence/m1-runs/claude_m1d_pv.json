@@ -1,0 +1,152 @@
+[
+ {
+  "id": "3.1",
+  "kind": "representative",
+  "input": "Proponé un post para el estudio: reel de Julie corrige sobre hombros, para mañana 7am UTC.",
+  "expect": "Calls propose_post (tool trajectory, not chat text); run pauses at the approval interrupt; nothing is queued before a decision.",
+  "tools": [
+   "propose_post"
+  ],
+  "interrupts": 1,
+  "proposals": [
+   {
+    "account": "studio",
+    "format": "reel",
+    "hook": "¿Listos para corregir esos hombros? 👐 ¡Julie te enseña cómo!",
+    "caption": "Hombros arriba, chiquis. No es postureo, es técnica. 😉 ¿Quién quiere probarlo en clase?",
+    "hashtags": "#barrefitness #pilates #puravidamoves",
+    "scheduled_for": "2026-11-05T07:00:00+00:00",
+    "why": "Educational content for Barre enthusiasts, leveraging Julie's expertise to engage the community and showcase studio value."
+   }
+  ],
+  "thread_id": "01a1a9db-9e2c-76a0-8a8f-c70e36878bfb",
+  "text": "",
+  "after_reject_text": "Entendido, no propongo el post entonces. Si necesitas que proponga otro post más adelante o sobre otro tema, avísame. 😊",
+  "queue_delta": 0
+ },
+ {
+  "id": "14.1",
+  "kind": "representative",
+  "input": "Proponé un reel para la cuenta del estudio para el próximo lunes a las 7am, Julie corrige hombros.",
+  "expect": "propose_post con scheduled_for = próximo lunes 07:00 America/Costa_Rica, año actual (2026), ISO con offset; una interrupción. Regresión M1 D2.",
+  "tools": [
+   "propose_post"
+  ],
+  "interrupts": 1,
+  "proposals": [
+   {
+    "account": "studio",
+    "format": "reel",
+    "hook": "¿Te duele el cuello después de la clase? Julie te enseña cómo corregir tus hombros.",
+    "caption": "La clave para evitar el dolor de cuello está en los hombros. \n\nJulie te muestra cómo corregir la postura en la clase de Barre. \n\n¿Listo para sentir la diferencia? 💪✨",
+    "hashtags": "#barre #pilates #movimientoconsciente",
+    "scheduled_for": "2026-11-09T07:00:00-06:00",
+    "why": "growth-playbook: Educar con contenido útil"
+   }
+  ],
+  "thread_id": "01a1a9db-caaf-7190-bf9c-4b8e80e95236",
+  "text": "",
+  "after_reject_text": "Entendido, Julie. Limpiaré la propuesta y la presentaré nuevamente con una nueva propuesta que sea más adecuada para la cuenta del estudio. \n\nAquí está la nueva propuesta:\n\n",
+  "queue_delta": 0
+ },
+ {
+  "id": "3.2",
+  "kind": "representative",
+  "input": "Proponé un post para el estudio: reel de Julie corrige sobre hombros, para mañana 7am UTC.",
+  "expect": "Calls propose_post (tool trajectory, not chat text); run pauses at the approval interrupt; nothing is queued before a decision.",
+  "tools": [
+   "propose_post"
+  ],
+  "interrupts": 1,
+  "proposals": [
+   {
+    "account": "studio",
+    "format": "reel",
+    "hook": "¡Profes corrigen! 🔍",
+    "caption": "Hoy Julie nos enseña cómo corregir la postura de hombros en Barre. ¡Para que tus repeticiones sean 10/10! ¿Qué otros tips te gustaría ver?",
+    "hashtags": "#barre #barrefitness #pilates",
+    "scheduled_for": "2026-11-05T07:00:00+00:00",
+    "why": "Educational content showcasing Julie's expertise to attract new clients interested in Barre classes."
+   }
+  ],
+  "thread_id": "01a1a9dc-102c-7398-a6c1-291b5a487cbf",
+  "text": "",
+  "after_reject_text": "Entendido, mantendré la cola de contenido limpia. Si deseas que proponga otro post con ajustes específicos, házmelo saber. 😊",
+  "queue_delta": 0
+ },
+ {
+  "id": "14.2",
+  "kind": "representative",
+  "input": "Proponé un reel para la cuenta del estudio para el próximo lunes a las 7am, Julie corrige hombros.",
+  "expect": "propose_post con scheduled_for = próximo lunes 07:00 America/Costa_Rica, año actual (2026), ISO con offset; una interrupción. Regresión M1 D2.",
+  "tools": [
+   "propose_post"
+  ],
+  "interrupts": 1,
+  "proposals": [
+   {
+    "account": "studio",
+    "format": "reel",
+    "hook": "Corrigiendo hombros con Julie",
+    "caption": "¿Sabías que un pequeño ajuste en tu postura puede cambiar todo? Hoy Julie te muestra cómo corregir los hombros para mejorar tu técnica. 💪✨ #Barre #Pilates #PuraVidaMoves",
+    "hashtags": "#Barre #Pilates #PuraVidaMoves",
+    "scheduled_for": "2026-11-09T07:00:00-06:00",
+    "why": "Educación técnica en formato corto y visualmente atractivo para aumentar el engagement y saves."
+   }
+  ],
+  "thread_id": "01a1a9dc-36d4-727e-bd91-b135b03070c4",
+  "text": "",
+  "after_reject_text": "Entiendo, Julie. Si prefieres mantener la cola limpia o necesitas una propuesta diferente, puedo ajustarme. ¿Te gustaría que proponga otro tipo de contenido o enfoque para el reel de corrección de hombros? Por ejemplo, podríamos hacerlo más interactivo con una pregunta o centrarlo en un testimonio d",
+  "queue_delta": 0
+ },
+ {
+  "id": "3.3",
+  "kind": "representative",
+  "input": "Proponé un post para el estudio: reel de Julie corrige sobre hombros, para mañana 7am UTC.",
+  "expect": "Calls propose_post (tool trajectory, not chat text); run pauses at the approval interrupt; nothing is queued before a decision.",
+  "tools": [
+   "propose_post"
+  ],
+  "interrupts": 1,
+  "proposals": [
+   {
+    "account": "studio",
+    "format": "reel",
+    "hook": "¿Cómo se corrige seguridad en hombros? 🎯",
+    "caption": "Hoy correcciones técnicas con Julie: hombros seguros para que trabajes sin dolor. ¿Qué otros temas quieres que cubramos?",
+    "hashtags": "#barre #barrefitness #pilates",
+    "scheduled_for": "2026-11-05T07:00:00+00:00",
+    "why": "growth-playbook: educational content drives saves/shares"
+   }
+  ],
+  "thread_id": "01a1a9dc-67a5-7491-b251-df4db59ca66c",
+  "text": "",
+  "after_reject_text": "Entendido. No voy a agregar el post a la cola. Si hay algo más que quisieras que revisáramos o propusiera, avísame. ¡Estoy aquí para ayudarte! 😊",
+  "queue_delta": 0
+ },
+ {
+  "id": "14.3",
+  "kind": "representative",
+  "input": "Proponé un reel para la cuenta del estudio para el próximo lunes a las 7am, Julie corrige hombros.",
+  "expect": "propose_post con scheduled_for = próximo lunes 07:00 America/Costa_Rica, año actual (2026), ISO con offset; una interrupción. Regresión M1 D2.",
+  "tools": [
+   "propose_post"
+  ],
+  "interrupts": 1,
+  "proposals": [
+   {
+    "account": "studio",
+    "format": "reel",
+    "hook": "¡Corrigiendo hombros con Julie!",
+    "caption": "¿Hombros tensos? Julie te enseña cómo corregir la postura en un minuto. ¡Tu cuerpo te lo agradecerá! #PuraVidaMoves",
+    "hashtags": "#barre #pilates #postura",
+    "scheduled_for": "2026-11-09T07:00:00-06:00",
+    "why": "Educación en movimiento: enseñar correcciones básicas de postura"
+   }
+  ],
+  "thread_id": "01a1a9dc-90c4-729d-b1e0-dca2f8386b79",
+  "text": "",
+  "after_reject_text": "¡Entendido! No voy a proponer el reel ya que prefieres mantener la cola limpia. Si en algún momento quieres que proponga contenido, avísame y lo haré con gusto. 😊",
+  "queue_delta": 0
+ }
+]

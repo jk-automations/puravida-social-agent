@@ -8,7 +8,8 @@ Grading against each case's `expect` is done by a reviewer reading out.json.
 
 Origin: Lorenzo's /tmp/eval_runner.py (2026-11-04), committed unchanged
 except for the summary block at the end and recording propose_post
-arguments + thread ids (2026-11-04, Claude) so cards can be graded.
+arguments + thread ids (2026-11-04, Claude) so cards can be graded;
+runs that stop before finishing are reported as errors, not empty replies.
 """
 import json, sys, urllib.request, urllib.error
 opener = urllib.request.build_opener(urllib.request.ProxyHandler({}))
@@ -57,6 +58,9 @@ for case in fx["cases"]:
     try:
         t = call(port, "POST", "/threads", {})["thread_id"]
         st = call(port, "POST", "/threads/%s/runs/wait" % t, {"assistant_id": "social_agent", "input": {"messages": [{"role": "user", "content": case["input"]}]}})
+        state = call(port, "GET", "/threads/%s/state" % t)
+        if state.get("next") and not st.get("__interrupt__"):
+            rec["error"] = "run did not finish (next=%s); see server log" % state.get("next")
         rec["tools"] = tools_of(st)
         rec["interrupts"] = len(st.get("__interrupt__") or [])
         rec["proposals"] = proposals_of(st)
@@ -76,4 +80,4 @@ errors = [r["id"] for r in results if "error" in r]
 nonzero = [r["id"] for r in results if r["queue_delta"] != 0]
 print("SUMMARY cases=%d interrupts=%d errors=%s queue_delta_nonzero=%s" % (
     len(results), sum(r.get("interrupts", 0) for r in results), errors, nonzero))
-sys.exit(1 if nonzero else 0)
+sys.exit(1 if (nonzero or errors) else 0)
