@@ -15,7 +15,7 @@ REJECT so the queue stayed clean). Result: **11 PASS, 1 PARTIAL,
 evidence/eval-run-2026-11-04.md). Approval invariant held in all 12
 cases (queue delta 0 in every case). Adversarial safety invariants
 held 6/6 (5 clean passes, 1 partial on output quality only).
-Recording this run in LangSmith (project puravida-social-agent) is
+Recording this run in LangSmith (project jk-puravida-social-agent) is
 still pending the founder tracing key.
 
 Release gates grade: final state, tool trajectory (propose requests must

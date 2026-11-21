@@ -10,8 +10,10 @@ Traced in LangSmith when LANGSMITH_API_KEY is set in .env.
 
 import json
 import os
-from datetime import datetime, timezone
+import re
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 from deepagents import create_deep_agent
 from deepagents.profiles import (GeneralPurposeSubagentProfile,
@@ -19,7 +21,9 @@ from deepagents.profiles import (GeneralPurposeSubagentProfile,
                                  register_harness_profile)
 from deepagents.backends import FilesystemBackend
 from deepagents.middleware.filesystem import FilesystemMiddleware
-from langchain.agents.middleware import HumanInTheLoopMiddleware
+from langchain.agents.middleware import (AgentMiddleware, HumanInTheLoopMiddleware,
+                                         ModelRetryMiddleware)
+from langchain_core.messages import SystemMessage
 from langchain_core.tools import tool
 
 BASE = Path(__file__).parent
@@ -30,6 +34,169 @@ QUEUE_FILE = DATA / "queue.json"
 def _load(name: str) -> dict:
     with open(DATA / name, encoding="utf-8") as f:
         return json.load(f)
+
+
+ACCOUNTS = '"personal" (@puravidamoves) or "studio" (@puravidamoves.studio)'
+
+
+# --- M1 safety (2026-11-04): deterministic checks on every proposal -------
+# Run twice: (a) as the approval gate's `when` predicate, so an invalid
+# proposal never reaches the owner's approval card, and (b) inside the tool
+# body, so an invalid proposal can never be queued either way.
+OWNER_TZ_NAME = "America/Costa_Rica"
+OWNER_TZ = ZoneInfo(OWNER_TZ_NAME)
+VALID_FORMATS = ("reel", "carousel", "photo", "story")
+MAX_DAYS_AHEAD = 90
+
+# Results/outcome claims the agent may not make up. Matching text is
+# rejected; a real, verified case has to be added to the brain and the
+# post written by a person.
+_CLAIM_PATTERNS = [
+    r"\b(doubl|tripl|quadrupl)(e|ed|es|ing)\b",
+    r"\b\d+(?:[.,]\d+)?\s?%",
+    r"\b\d+(?:[.,]\d+)?\s?(x|×)(?=\W|$)",
+    r"\b(increased|grew|boosted|skyrocketed|tripled|doubled)\b[^.!?]{0,60}"
+    r"\b(bookings?|sales|revenue|leads?|clients?|customers?|followers?)\b",
+    r"\b(our|a|one of our)\s+clients?\b[^.!?]{0,80}"
+    r"\b(got|gained|increased|grew|saw|went from|booked|closed|made)\b",
+    # Spanish (Julie writes Spanish-first)
+    r"\b(duplic|triplic|cuadruplic)\w*",
+    r"\b(aument|increment|crec)\w*[^.!?]{0,60}"
+    r"\b(reservas?|ventas?|clientes?|seguidor\w*|alumn\w*|ingresos)\b",
+    r"\b(pierd|perd|baj)\w*\s+\d+\s?(kilos?|kg|libras?|lbs?|tallas?)\b",
+    r"\b\d+\s?(kilos?|kg|libras?|lbs)\s+(menos|en\s+\d+)",
+]
+
+
+# Exact class schedule is on the brain's Unknown list: any clock time in
+# public copy is a schedule claim Julie hasn't given us (eval 14.2, 2026-11-04).
+_SCHEDULE_PATTERNS = [
+    r"\b\d{1,2}(?::\d{2})?\s?(?:am|pm|a\.m\.|p\.m\.)(?=\W|$)",
+    r"\b(?:a las|a la|at)\s+\d{1,2}(?::\d{2})?\b",
+    r"\b\d{1,2}:\d{2}\s?(?:hs|h)?\b",
+]
+
+
+def find_schedule_claims(text: str) -> list[str]:
+    hits = []
+    for pat in _SCHEDULE_PATTERNS:
+        hits += [m.group(0).strip() for m in re.finditer(pat, text or "", flags=re.IGNORECASE)]
+    return hits
+
+
+def _valid_accounts() -> list[str]:
+    return sorted(_load("accounts.json").keys())
+
+
+def _parse_when(value: str) -> datetime:
+    text = str(value).strip().replace("Z", "+00:00")
+    dt = datetime.fromisoformat(text)
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=OWNER_TZ)
+    return dt
+
+
+def find_claims(text: str) -> list[str]:
+    hits = []
+    for pat in _CLAIM_PATTERNS:
+        for m in re.finditer(pat, text or "", flags=re.IGNORECASE):
+            hits.append(m.group(0).strip())
+    return hits
+
+
+def validate_post(args: dict, now: datetime | None = None) -> list[str]:
+    """Return a list of problems with a proposal; empty list = valid."""
+    now = now or datetime.now(OWNER_TZ)
+    problems = []
+    account = str(args.get("account", "")).strip().lower()
+    if account not in _valid_accounts():
+        problems.append(f"account '{args.get('account')}' is not valid; use {ACCOUNTS}.")
+    if str(args.get("format", "")).strip().lower() not in VALID_FORMATS:
+        problems.append(f"format must be one of {', '.join(VALID_FORMATS)}.")
+    try:
+        when = _parse_when(args.get("scheduled_for", ""))
+        if when < now - timedelta(minutes=10):
+            problems.append(
+                f"scheduled_for {args.get('scheduled_for')} is in the past; "
+                f"today is {now:%Y-%m-%d} ({OWNER_TZ_NAME}).")
+        elif when > now + timedelta(days=MAX_DAYS_AHEAD):
+            problems.append(
+                f"scheduled_for {args.get('scheduled_for')} is more than "
+                f"{MAX_DAYS_AHEAD} days out; today is {now:%Y-%m-%d}.")
+    except (TypeError, ValueError):
+        problems.append(
+            "scheduled_for must be an ISO date-time, e.g. "
+            f"{(now + timedelta(days=1)):%Y-%m-%d}T09:00:00-08:00.")
+    times = find_schedule_claims(f"{args.get('hook', '')}\n{args.get('caption', '')}")
+    if times:
+        problems.append(
+            "class times in public copy: " + "; ".join(f'"{t}"' for t in times)
+            + ". The exact schedule is UNKNOWN. Remove the time, or ask Julie "
+              "for it first.")
+    claims = find_claims(f"{args.get('hook', '')}\n{args.get('caption', '')}")
+    if claims:
+        problems.append(
+            "unverified results claim(s): " + "; ".join(f'"{c}"' for c in claims)
+            + ". Never invent results, and do NOT rewrite it into a different "
+              "client story: no made-up client, customer, patient or business "
+              "presented as real. Stop and say a verified case is needed; offer a "
+              "how-it-works post instead. Remove the claim, or ask Julie for a "
+              "real, verified case.")
+    return problems
+
+
+def _model_busy_message(exc: Exception) -> str:
+    """Owner-facing text when the model provider keeps failing (e.g. 429)."""
+    return "El modelo de IA está ocupado en este momento (límite de uso). No se envió ni se agregó nada a la cola. Probá de nuevo en un minuto."
+
+
+def _needs_approval(request) -> bool:
+    """Approval gate `when` predicate: only valid proposals reach the card.
+
+    Invalid ones skip the card and are refused by the tool body, so the
+    model gets the problem list back and must fix the proposal.
+    """
+    return not validate_post(request.tool_call.get("args", {}))
+
+
+class DateGroundingMiddleware(AgentMiddleware):
+    """Append the current date/time to the system message on every model call.
+
+    The system prompt is built once at import; without this the model
+    guessed dates in 2023 (eval 2026-11-04, cases 6 and 10).
+    """
+
+    @staticmethod
+    def date_line(now: datetime | None = None) -> str:
+        now = now or datetime.now(OWNER_TZ)
+        offset = now.strftime("%z")
+        offset = f"{offset[:3]}:{offset[3:]}"
+        days = ", ".join(f"{(now + timedelta(days=i)):%a %Y-%m-%d}" for i in range(1, 8))
+        return (f"\n\nCURRENT DATE AND TIME: {now:%A %Y-%m-%d %H:%M} "
+                f"({OWNER_TZ_NAME}, UTC offset {offset}). Use this year for every date.\n"
+                f"NEXT 7 DAYS: {days}. Look weekdays up here; never compute them.\n"
+                f"scheduled_for must be a future ISO date-time with an offset: use "
+                f"{offset} by default, but if the owner names another time zone "
+                f"(e.g. 'UTC', 'PT') use that zone's offset (UTC = +00:00). "
+                f"Example: {(now + timedelta(days=1)):%Y-%m-%d}T09:00:00{offset}.")
+
+    def _with_date(self, request):
+        line = self.date_line()
+        sm = request.system_message
+        if sm is None:
+            return request.override(system_message=SystemMessage(content=line.strip()))
+        content = sm.content
+        if isinstance(content, str):
+            new = content + line
+        else:
+            new = list(content) + [{"type": "text", "text": line}]
+        return request.override(system_message=SystemMessage(content=new))
+
+    def wrap_model_call(self, request, handler):
+        return handler(self._with_date(request))
+
+    async def awrap_model_call(self, request, handler):
+        return await handler(self._with_date(request))
 
 
 @tool
@@ -94,6 +261,14 @@ def propose_post(account: str, format: str, hook: str, caption: str,
     if not _kill_switch_on():
         return ("Kill switch is OFF (PURAVIDA_AGENT_ENABLED is not "
                 "set to true). This agent is disabled; nothing was queued.")
+    problems = validate_post({"account": account, "format": format, "hook": hook,
+                              "caption": caption, "scheduled_for": scheduled_for})
+    if problems:
+        return ("NOT QUEUED. The proposal failed the safety checks and was not "
+                "shown for approval:\n- " + "\n- ".join(problems)
+                + "\nFix every point and call propose_post again, or tell "
+                  "Julie plainly why you can't.")
+    account = account.strip().lower()
     entry = {
         "account": account,
         "format": format,
@@ -185,15 +360,35 @@ OPERATING RULES (non-negotiable):
   reports. Anything public goes through propose_post (pauses for Julie's
   approve / edit / reject) or is shown as a draft for her explicit OK.
   Queued is NOT published — always say the true state.
-- When Julie asks you to propose a post, ALWAYS call propose_post — never present a queue-ready post only as chat text.
-- Worked example: the owner says "propose a post" (any wording) -> you IMMEDIATELY call propose_post with concrete values you choose (account, format, hook, caption, hashtags, scheduled_for, why) and let the approval card speak. You never return an empty reply to a propose request.
 - Facts only from tools and files. Never invent prices, schedules,
   offers, addresses or results. Missing fact = ask Julie or omit it.
+- If a request asks for something these rules forbid (an invented result,
+  a price, a schedule or address you don't have), REFUSE it in plain words
+  and offer a truthful alternative. Never put a forbidden claim on an
+  approval card.
+- Reply to Julie in plain conversational text (markdown is fine). Never
+  reply with JSON, status objects or code blocks unless asked, and don't
+  narrate loading skills or files — just do the work.
+- Public words (captions, comment and DM replies) never mention internal
+  notes, rules, unset prices, programs or offers that aren't in the brain,
+  or your reasoning.
+- Never invent a client, customer, patient or business, or a story about
+  one, and present it as real. A hypothetical must be labeled as one
+  ("Example:" / "Imagine a ...") and carries no outcome claim.
+- Otherwise, when Julie asks you to propose a post, call propose_post —
+  never present a queue-ready post only as chat text, and never return an
+  empty reply. Worked example: "proponé un post" (any wording) -> you call
+  propose_post with concrete values (account, format, hook, caption,
+  hashtags, scheduled_for as a future ISO date-time with offset, why) and
+  let the approval card speak. If it comes back NOT QUEUED, fix every
+  listed problem and call it again.
 - Voice: Julie's, per the julie-voice skill and brand files. SHORT
   captions (~170 characters is her average), community first, humor or
   heart — never flyer-speak, never hype.
 
-SKILLS — load the matching skill BEFORE doing that kind of work:
+SKILLS are files, not tools. Load one with read_file on
+/skills/<name>/SKILL.md BEFORE doing that kind of work. Never call a skill
+name as a tool:
 - lens-audit: scoring/auditing either account.
 - julie-voice: drafting any public words.
 - growth-playbook: planning content or outreach; every proposal's WHY
@@ -218,7 +413,7 @@ if not _kill_switch_on():
 _BACKEND = FilesystemBackend(root_dir=str(BASE), virtual_mode=True)
 
 
-agent = create_deep_agent(
+_graph = create_deep_agent(
     name="social_media_manager",
     model=os.environ.get("MODEL_NAME", "openai:gpt-4.1"),
     tools=([account_snapshot, lens_quick_audit, content_queue]
@@ -239,9 +434,21 @@ agent = create_deep_agent(
             interrupt_on={
                 "propose_post": {
                     "allowed_decisions": ["approve", "edit", "reject"],
+                    "when": _needs_approval,
                 },
             },
             description_prefix="Post approval pending",
         ),
+        DateGroundingMiddleware(),
+        # 429s from the model provider made runs die silently (eval
+        # 2026-11-04: empty replies). Retry with backoff, then say so.
+        ModelRetryMiddleware(max_retries=4, initial_delay=2.0, backoff_factor=2.0,
+                             max_delay=30.0, on_failure=_model_busy_message),
     ],
 )
+
+# Agent Dojo links LangSmith root runs to this agent by the `agent:<dojo id>` tag
+# (project name must start with `jk-`). with_config keeps a CompiledStateGraph, so
+# langgraph.json / `langgraph dev` still load it and every root run carries the tag.
+DOJO_AGENT_ID = "agent-repo.client-puravida-social-v1"
+agent = _graph.with_config({"tags": ["agent:" + DOJO_AGENT_ID], "metadata": {"dojo_agent": DOJO_AGENT_ID}})
