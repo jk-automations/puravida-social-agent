@@ -44,7 +44,7 @@ Two capabilities exceed the Scout/Scribe baseline and are justified here:
 
 - The client sees every proposed post with its WHY (which growth method it serves) before deciding approve / edit / reject.
 - Queued is not published: the agent states the true state in every reply, and the queue file is the auditable record (gitignored runtime data on the Studio; the brain and code are in git).
-- Founders can inspect everything the agent is: this package, the agent repo, and LangSmith traces (project puravida-social-agent) once tracing is enabled with the client's tracing key step.
+- Founders can inspect everything the agent is: this package, the agent repo, and LangSmith traces (project jk-puravida-social-agent) once tracing is enabled with the client's tracing key step.
 
 ## Evaluation and operations
 

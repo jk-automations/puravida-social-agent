@@ -413,7 +413,7 @@ if not _kill_switch_on():
 _BACKEND = FilesystemBackend(root_dir=str(BASE), virtual_mode=True)
 
 
-agent = create_deep_agent(
+_graph = create_deep_agent(
     name="social_media_manager",
     model=os.environ.get("MODEL_NAME", "openai:gpt-4.1"),
     tools=([account_snapshot, lens_quick_audit, content_queue]
@@ -446,3 +446,9 @@ agent = create_deep_agent(
                              max_delay=30.0, on_failure=_model_busy_message),
     ],
 )
+
+# Agent Dojo links LangSmith root runs to this agent by the `agent:<dojo id>` tag
+# (project name must start with `jk-`). with_config keeps a CompiledStateGraph, so
+# langgraph.json / `langgraph dev` still load it and every root run carries the tag.
+DOJO_AGENT_ID = "agent-repo.client-puravida-social-v1"
+agent = _graph.with_config({"tags": ["agent:" + DOJO_AGENT_ID], "metadata": {"dojo_agent": DOJO_AGENT_ID}})
